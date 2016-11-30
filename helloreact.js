@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   instructions: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#117722',
+    color: '#86da17',
     marginBottom: 5,
   },
 });
