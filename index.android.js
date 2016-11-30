@@ -1,16 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+import { AppRegistry } from 'react-native';
+import App from './app';
 
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-import HelloReact from './helloreact.js';
-
-AppRegistry.registerComponent('HelloReact', () => HelloReact);
+AppRegistry.registerComponent('HelloReact', () => App);
