@@ -28,6 +28,11 @@ var styles = StyleSheet.create({
     width: 53,
     height: 81,
   },
+  separator: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#8E8E8E',
+  },
   listView: {
     paddingTop: 20,
     backgroundColor: '#F5FCFF',
