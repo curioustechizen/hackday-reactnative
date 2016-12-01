@@ -1,112 +1,79 @@
 import React from 'react';
-import { View, ListView, Image, Text, StyleSheet } from 'react-native';
-//import styles from './styles';
+import { View, ListView, Image, Text, TouchableOpacity } from 'react-native';
+import RestApi from '../../src/RestApi.js'
+import styles from './styles.js';
 
-var REQUEST_URL = 'http://private-b3d005-hackdayreactnative.apiary-mock.com/collect_data';
-
-class EXListView extends React.Component {
+export class EXListView extends React.Component {
   constructor(props) {
     super(props);
-
+    this.restApi = new RestApi();
     this.state = {
-      dataSource: new ListView.DataSource({
-        rowHasChanged: (row1, row2) => row1 !== row2,
-      }),
+      dataSource: new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2}),
       loaded: false,
     };
   }
 
   render() {
-    if (!this.state.dataSource) {
-      return renderLoadingView();
-    }
-    
-    return <ListView
-      dataSource={this.state.dataSource}
-      renderRow={this.renderDataRow}
-      renderSeparator={(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
-      style={styles.listView}
-    />
+    if (!this.state.loaded)
+      return this._renderLoadingView();
+    else
+      return <ListView
+        dataSource={this.state.dataSource}
+        renderRow={this._renderDataRow}
+        renderSeparator={(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
+        style={styles.listView}
+      />
+  }
+
+  componentWillMount() {
+    this.state = {
+      dataSource: new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2}),
+      loaded: false,
+    };
   }
 
   componentDidMount() {
-    this.fetchData();
-  }
-
-  fetchData() {
-    fetch(REQUEST_URL)
-      .then((response) => response.json())
-      .then((responseData) => {
+    this.restApi._getCollectionsData((responseData, error) => {
+      if (!error) {
+        console.log(responseData);
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(responseData),
           loaded: true,
         });
-      })
-      .done();
+      }
+    });
   }
 
-  renderLoadingView() {
+  _onListItemClicked(data) {
+    console.log('Item Clicked : '.concat(data));
+  }
+
+  _renderLoadingView() {
     return (
       <View style={styles.container}>
-        <Text style={style.container}>
+        <Text style={styles.title}>
           Loading data...
         </Text>
       </View>
     );
   }
 
-  renderDataRow(dataSource) {
+  _renderDataRow(data) {
     return (
-      <View style={styles.container}>
-        <Image
-          source={{uri: dataSource.thumbnail}}
-          style={styles.thumbnail}
-        />
-        <View style={styles.rightContainer}>
-          <Text style={styles.title}>{dataSource.title}</Text>
-          <Text style={styles.content}>{dataSource.content}</Text>
+      <TouchableOpacity>
+        <View style={styles.container}>
+          <Image
+            source={{uri: data.thumbnail}}
+            style={styles.thumbnail}
+          />
+          <View style={styles.rightContainer}>
+            <Text style={styles.title}>{data.title}</Text>
+            <Text style={styles.content}>{data.content}</Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  rightContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  content: {
-    fontSize: 18,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  year: {
-    textAlign: 'center',
-  },
-  thumbnail: {
-    width: 53,
-    height: 81,
-  },
-  separator: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#8E8E8E',
-  },
-  listView: {
-    backgroundColor: '#F5FCFF',
-  },
-});
 
 export default EXListView;
