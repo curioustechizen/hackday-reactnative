@@ -3,7 +3,10 @@ import { View, ListView, Image, Text, TouchableOpacity } from 'react-native';
 import RestApi from '../../src/RestApi.js'
 import styles from './styles.js';
 
+var callback;
+
 export class EXListView extends React.Component {
+
   constructor(props) {
     super(props);
     this.restApi = new RestApi();
@@ -11,21 +14,23 @@ export class EXListView extends React.Component {
       dataSource: new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2}),
       loaded: false,
     };
+    callback = props.listener;
   }
 
   render() {
-    if (!this.state.loaded)
+    if (!this.state.loaded) {
       return this._renderLoadingView();
-    else
+    } else {
       return <ListView
         dataSource={this.state.dataSource}
         renderRow={this._renderDataRow}
         renderSeparator={(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
         style={styles.listView}
       />
+    }
   }
 
-  componentWillMount() {
+  componentWillUpdate() {
     this.state = {
       dataSource: new ListView.DataSource({rowHasChanged:(r1,r2) => r1 !== r2}),
       loaded: false,
@@ -35,7 +40,6 @@ export class EXListView extends React.Component {
   componentDidMount() {
     this.restApi._getCollectionsData((responseData, error) => {
       if (!error) {
-        console.log(responseData);
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(responseData),
           loaded: true,
@@ -44,8 +48,11 @@ export class EXListView extends React.Component {
     });
   }
 
-  _onListItemClicked(data) {
-    console.log('Item Clicked : '.concat(data));
+  _onItemListClicked(evt, data) {
+    if (callback) {
+      callback(data);
+      console.log(callback);
+    }
   }
 
   _renderLoadingView() {
@@ -60,7 +67,7 @@ export class EXListView extends React.Component {
 
   _renderDataRow(data) {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity onPress={(evt) => {EXListView.prototype._onItemListClicked(evt, data)}}>
         <View style={styles.container}>
           <Image
             source={{uri: data.thumbnail}}

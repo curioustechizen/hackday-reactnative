@@ -1,6 +1,6 @@
 import React from 'react';
-import EXListView from './components/EXListView';
+import MainListLayout from './layouts/MainListLayout.js';
 
 export default App = (props) => {
-    return <EXListView />
+    return <MainListLayout />
 }
